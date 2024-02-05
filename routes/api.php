@@ -22,12 +22,15 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 
-Route::post('/register', [UsersController::class, 'store']);
-Route::post('/login', [UsersController::class, 'login']);
+Route::post('/api/register', [UsersController::class, 'store']);
+Route::post('/api/login', [UsersController::class, 'login']);
+
+Route::get('/{teste}', [LinksController::class, 'testando']);
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::prefix('links')->group(function () {
-        Route::resource('/', LinksController::class);
+    Route::prefix('api/links')->group(function () {
+        Route::get('/', [LinksController::class, 'index']);
+        Route::post('/', [LinksController::class, 'store']);
     });
 });
 

@@ -13,6 +13,17 @@ use Illuminate\Support\Facades\Hash;
 
 class LinksController extends Controller
 {
+    public function testando(string $urlLink)
+    {
+        $link = Link::where('shortenedUrl', $urlLink)->first();
+        if ($link) {
+            $link->views_quantity++;
+            $link->save();
+            return redirect()->away($link->originalUrl);
+        }
+        return response()->json('Url not found', 401);
+    }
+
     public function index()
     {
         $user = Auth::user();
