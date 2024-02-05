@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Hash;
 
 class LinksController extends Controller
 {
-    public function testando(string $urlLink)
+    public function redirectLink(string $urlLink)
     {
         $link = Link::where('shortenedUrl', $urlLink)->first();
         if ($link) {
@@ -35,6 +35,15 @@ class LinksController extends Controller
         $request;
         $user = Auth::user();
         $request->request->add(['user_id' => $user->id]);
+        if ($request->shortenedUrl === null) {
+            $numeroAleatorio = rand(6, 8);
+            $stringAleatoria = mt_rand();
+            $hash = md5($stringAleatoria);
+            $linkAleatorio = substr($hash, 0, $numeroAleatorio);
+
+            $request->shortenedUrl = $linkAleatorio;
+        }
+
         $link = Link::create([
             'shortenedUrl' => $request->shortenedUrl,
             'originalUrl' => $request->originalUrl,
@@ -42,5 +51,21 @@ class LinksController extends Controller
             'user_id' => $user->id,
         ]);
         return $link;
+    }
+
+    public function destroy(int $id)
+    {
+        $user = Auth::user();
+        $link = Link::where('id', $id)->first();
+
+        if (!$link) {
+            return response()->json('Something gone wrong!', 404);
+        }
+
+        if ($user->id === $link->user_id) {
+            $link->delete();
+            return response()->noContent();
+        }
+        return response()->json("You don't have permission!", 403);
     }
 }

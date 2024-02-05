@@ -25,22 +25,23 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('/api/register', [UsersController::class, 'store']);
 Route::post('/api/login', [UsersController::class, 'login']);
 
-Route::get('/{teste}', [LinksController::class, 'testando']);
+Route::get('/{teste}', [LinksController::class, 'redirectLink']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('api/links')->group(function () {
         Route::get('/', [LinksController::class, 'index']);
         Route::post('/', [LinksController::class, 'store']);
+        Route::delete('/{id}', [LinksController::class, 'destroy']);
     });
 });
 
 // Route::get('/users', [UsersController::class, 'show']);
 // Route::get('/teste', function () {
-//     $numeroAleatorio = rand(6, 8);
-//     $stringAleatoria = mt_rand();
-//     $hash = md5($stringAleatoria);
-//     $linkAleatorio = substr($hash, 0, $numeroAleatorio);
+$numeroAleatorio = rand(6, 8);
+$stringAleatoria = mt_rand();
+$hash = md5($stringAleatoria);
+$linkAleatorio = substr($hash, 0, $numeroAleatorio);
 
-//     return $linkAleatorio;
-//     // return auth()->user();
+return $linkAleatorio;
+    // return auth()->user();
 // });
