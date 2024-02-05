@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('links', function ($table) {
-            $table->unsignedBigInteger('users_id');
+        Schema::table('links', function (Blueprint $table) {
+            $table->foreignId('user_id')->constrained();
         });
     }
 
@@ -22,7 +22,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('links', function (Blueprint $table) {
-            $table->dropColumn('users_id');
+            $table->dropForeign(['user_id']);
+            $table->dropColumn('user_id');
         });
     }
 };

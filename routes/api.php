@@ -24,18 +24,20 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::post('/register', [UsersController::class, 'store']);
 Route::post('/login', [UsersController::class, 'login']);
-Route::get('/link', [LinksController::class, 'show']);
-
 
 Route::middleware('auth:sanctum')->group(function () {
-    // Route::get('/users', [UsersController::class, 'show']);
-    Route::get('/teste', function () {
-        $numeroAleatorio = rand(6, 8);
-        $stringAleatoria = mt_rand();
-        $hash = md5($stringAleatoria);
-        $linkAleatorio = substr($hash, 0, $numeroAleatorio);
-
-        return $linkAleatorio;
-        // return auth()->user();
+    Route::prefix('links')->group(function () {
+        Route::resource('/', LinksController::class);
     });
 });
+
+// Route::get('/users', [UsersController::class, 'show']);
+// Route::get('/teste', function () {
+//     $numeroAleatorio = rand(6, 8);
+//     $stringAleatoria = mt_rand();
+//     $hash = md5($stringAleatoria);
+//     $linkAleatorio = substr($hash, 0, $numeroAleatorio);
+
+//     return $linkAleatorio;
+//     // return auth()->user();
+// });
