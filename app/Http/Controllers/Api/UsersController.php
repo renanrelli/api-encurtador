@@ -22,12 +22,24 @@ class UsersController extends Controller
         $data['password'] = Hash::make($data['password']);
 
         $user = User::create($data);
-        Auth::login($user);
-        return $user;
-        // $user = User::create($data);
+        if ($user) {
+            Auth::login($user);
+            return response()->json($user, 201);
+        }
+    }
 
-        // Auth::login($user);
+    public function login(Request $request)
+    {
+        $credentials = $request->only(['email', 'password']);
+        if (!Auth::attempt($credentials)) {
+            return response()->json('Incorrect email and / or password', 401);
+        }
 
-        // return response()->json($user, 201);
+        /** @var \App\Models\User $user **/
+        $user = Auth::user();
+        $user->tokens()->delete();
+        $token = $user->createToken('token');
+
+        return response()->json($token->plainTextToken);
     }
 }
