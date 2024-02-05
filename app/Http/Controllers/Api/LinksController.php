@@ -8,6 +8,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\LinkPostRequest;
 use App\Http\Requests\UserPostRequest;
 use App\Models\Link;
+use App\Models\LinkStats;
+use App\Models\TotalView;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
@@ -17,11 +20,21 @@ class LinksController extends Controller
     {
         $link = Link::where('shortenedUrl', $urlLink)->first();
         if ($link) {
+            $totalView = LinkStats::where('user_id', $link->user_id)->first();
+            $totalView->number_of_views++;
             $link->views_quantity++;
+            $totalView->save();
             $link->save();
             return redirect()->away($link->originalUrl);
         }
         return response()->json('Url not found', 401);
+    }
+
+    public function totalViewsLink(User $user)
+    {
+        $user = Auth::user();
+        $totalView = LinkStats::where('user_id', $user->id)->first();
+        return response()->json(['Your links total views' => $totalView->number_of_views, 'Links Quantity' => $totalView->number_of_links], 201);
     }
 
     public function index()
@@ -40,7 +53,6 @@ class LinksController extends Controller
             $stringAleatoria = mt_rand();
             $hash = md5($stringAleatoria);
             $linkAleatorio = substr($hash, 0, $numeroAleatorio);
-
             $request->shortenedUrl = $linkAleatorio;
         }
 
@@ -50,6 +62,11 @@ class LinksController extends Controller
             'title' => $request->title,
             'user_id' => $user->id,
         ]);
+
+        $linkStats = LinkStats::where('user_id', $user->id)->first();
+        $linkStats->number_of_links++;
+        $linkStats->save();
+
         return $link;
     }
 
@@ -63,6 +80,10 @@ class LinksController extends Controller
         }
 
         if ($user->id === $link->user_id) {
+            $linkStats = LinkStats::where('user_id', $user->id)->first();
+            $linkStats->number_of_links--;
+            $linkStats->number_of_views -= $link->views_quantity;
+            $linkStats->save();
             $link->delete();
             return response()->noContent();
         }

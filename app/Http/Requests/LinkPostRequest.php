@@ -22,7 +22,7 @@ class LinkPostRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'shortenedUrl' => ['min:6', 'unique:links'],
+            'shortenedUrl' => ['min:6', 'unique:links', 'max:8'],
             'originalUrl' => ['required'],
             'title' => ['required', 'min:6']
         ];

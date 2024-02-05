@@ -48,4 +48,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Link::class, 'user_id', 'id');
     }
+
+    public function totalViews(): HasMany
+    {
+        return $this->hasMany(LinkStats::class, 'user_id', 'id');
+    }
 }
