@@ -30,9 +30,10 @@ Route::get('/{teste}', [LinksController::class, 'redirectLink']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('api/links')->group(function () {
         Route::get('/', [LinksController::class, 'index']);
-        Route::get('/total', [LinksController::class, 'totalViewsLink']);
         Route::post('/', [LinksController::class, 'store']);
+        Route::put('/{id}', [LinksController::class, 'update']);
         Route::delete('/{id}', [LinksController::class, 'destroy']);
+        Route::get('/total', [LinksController::class, 'totalViewsLink']);
     });
 });
 

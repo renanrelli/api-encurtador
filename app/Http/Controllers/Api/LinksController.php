@@ -43,6 +43,29 @@ class LinksController extends Controller
         return Link::where('user_id', $user->id)->get();
     }
 
+    public function update(int $id, LinkPostRequest $request)
+    {
+        $user = Auth::user();
+        $link = Link::whereId($id)->first();
+
+        if (!$link) {
+            return response()->json('Something gone wrong!', 404);
+        }
+
+        if ($user->id === $link->user_id) {
+            if ($request->shortenedUrl) {
+                $link->shortenedUrl = $request->shortenedUrl;
+            }
+            $link->originalUrl = $request->originalUrl;
+            $link->title = $request->title;
+            $link->save();
+
+            return response()->json($link, 200);
+        }
+
+        return response()->json("You don't have permission!", 403);
+    }
+
     public function store(LinkPostRequest $request)
     {
         $request;
