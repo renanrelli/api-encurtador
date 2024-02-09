@@ -25,7 +25,12 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('/api/register', [UsersController::class, 'store']);
 Route::post('/api/login', [UsersController::class, 'login']);
 
-Route::get('/{teste}', [LinksController::class, 'redirectLink']);
+Route::get('/{shortUrl}', [LinksController::class, 'redirectLink']);
+
+Route::get('/api/teste', function () {
+    return 'Olá Mundo';
+});
+
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('api/links')->group(function () {
