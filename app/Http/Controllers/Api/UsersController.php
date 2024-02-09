@@ -36,42 +36,17 @@ class UsersController extends Controller
 
     public function login(Request $request)
     {
-        if ($request->token) {
-            $personalAccessToken = PersonalAccessToken::findToken($request->token);
-
-            // Se encontrar o token
-            if ($personalAccessToken) {
-                // Obtém o usuário associado ao token
-                $user = $personalAccessToken->tokenable;
-
-                // Se encontrar o usuário
-                if ($user) {
-                    // Faz logout do usuário (caso já esteja autenticado)
-                    Auth::guard('web')->logout();
-
-                    // Autentica o usuário
-                    Auth::guard('web')->login($user);
-
-                    // Gera um novo token de acesso pessoal para o usuário
-                    $token = $user->createToken('token')->plainTextToken;
-
-                    // Retorna o token
-                    return response()->json($token, 200);
-                }
-            }
-        } else {
-            $credentials = $request->only(['email', 'password']);
-            if (!Auth::attempt($credentials)) {
-                return response()->json('Incorrect email and / or password', 401);
-            }
-
-            /** @var \App\Models\User $user **/
-            $user = Auth::user();
-            $user->tokens()->delete();
-            $token = $user->createToken('token');
-
-            return response()->json($token->plainTextToken, 200);
+        $credentials = $request->only(['email', 'password']);
+        if (!Auth::attempt($credentials)) {
+            return response()->json('Incorrect email and / or password', 401);
         }
+
+        /** @var \App\Models\User $user **/
+        $user = Auth::user();
+        $user->tokens()->delete();
+        $token = $user->createToken('token');
+
+        return response()->json($token->plainTextToken, 200);
     }
 
     public function logout(Request $request)
