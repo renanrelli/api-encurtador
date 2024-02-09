@@ -18,13 +18,16 @@ class LinksController extends Controller
 {
     public function redirectLink(string $urlLink)
     {
+
         $link = Link::where('shortenedUrl', $urlLink)->first();
         if ($link) {
-            $totalView = LinkStats::where('user_id', $link->user_id)->first();
-            $totalView->number_of_views++;
             $link->views_quantity++;
-            $totalView->save();
             $link->save();
+            $totalView = LinkStats::where('user_id', $link->user_id)->first();
+            if ($totalView) {
+                $totalView->number_of_views++;
+                $totalView->save();
+            }
             return redirect()->away($link->originalUrl);
         }
         return response()->json('Url not found', 401);
@@ -34,7 +37,7 @@ class LinksController extends Controller
     {
         $user = Auth::user();
         $totalView = LinkStats::where('user_id', $user->id)->first();
-        return response()->json(['Your links total views' => $totalView->number_of_views, 'Links Quantity' => $totalView->number_of_links], 201);
+        return response()->json(['total_views' => $totalView->number_of_views, 'links_quantity' => $totalView->number_of_links], 201);
     }
 
     public function index()
@@ -43,7 +46,7 @@ class LinksController extends Controller
         return Link::where('user_id', $user->id)->get();
     }
 
-    public function update(int $id, LinkPostRequest $request)
+    public function update(int $id, Request $request)
     {
         $user = Auth::user();
         $link = Link::whereId($id)->first();
@@ -54,7 +57,9 @@ class LinksController extends Controller
 
         if ($user->id === $link->user_id) {
             if ($request->shortenedUrl) {
-                $link->shortenedUrl = $request->shortenedUrl;
+                if ($request->shortenedUrl != $link->shortenedUrl) {
+                    $link->shortenedUrl = $request->shortenedUrl;
+                }
             }
             $link->originalUrl = $request->originalUrl;
             $link->title = $request->title;
